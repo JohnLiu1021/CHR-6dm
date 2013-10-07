@@ -43,11 +43,4 @@ private:
 	mask_16 channel_mask;
 };
 
-<<<<<<< HEAD
 #endif
-=======
-
-
-
-
->>>>>>> efd72ab5ec9c8d31cc1c1dab1d938b4808b1eaf6
