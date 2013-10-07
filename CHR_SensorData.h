@@ -1,5 +1,6 @@
 #ifndef CHR_SENSORDATA_H
 #define CHR_SENSORDATA_H 1
+
 #include<string.h>
 
 typedef unsigned short mask_16;
@@ -42,4 +43,11 @@ private:
 	mask_16 channel_mask;
 };
 
+<<<<<<< HEAD
 #endif
+=======
+
+
+
+
+>>>>>>> efd72ab5ec9c8d31cc1c1dab1d938b4808b1eaf6
