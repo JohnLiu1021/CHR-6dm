@@ -72,5 +72,40 @@ enum RX_Packet{
 	GET_MAG_CAL,
 	GET_MAG_BIAS
 };
+namespace CHR {
 
+unsigned short addCheckSum(unsigned char *packet)
+{
+	int N = packet[4];
+	unsigned short sum = 0;
+	for (int i=0; i<(N+5); i++)
+		sum += packet[i];
+	packet[N+5] = sum >> 8;
+	packet[N+6] = sum & 0xFF;
+	return sum;
+}
+
+bool verifyCheckSum(unsigned char *packet)
+{
+	int N = packet[4];
+	printf("N = %d\n", N);
+	unsigned short sum = 0;
+	for (int i=0; i<(N+5); i++)
+		sum += packet[i];
+
+	printf("verified checksum = %X\n", sum);
+
+	unsigned short sum_inpacket = packet[N+5] << 8 + packet[N+6];
+	printf("checksum in packet = %X\n", sum_inpacket);
+	return (sum_inpacket == sum);
+}
+
+bool verifyPacket(unsigned char *packet)
+{
+	if (packet[0] != 's' || packet[1] != 'n' || packet[2] != 'p')
+		return false;
+	return verifyCheckSum(packet);
+}
+
+};
 #endif
