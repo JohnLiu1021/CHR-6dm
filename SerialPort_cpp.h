@@ -9,6 +9,8 @@
 #include<limits.h>
 #include<string.h>
 
+typedef unsigned char byte;
+
 class SerialPort {
 public:
 	SerialPort(void);
@@ -27,9 +29,9 @@ public:
 	int GetPath(char *path);
 
 	int WriteData(char *buffer, int num);
-	int WriteData(unsigned char *buffer, int num);
+	int WriteData(byte *buffer, int num);
 	int ReadData(char *buffer, int num);
-	int ReadData(unsigned char *buffer, int num);
+	int ReadData(byte *buffer, int num);
 
 
 private:

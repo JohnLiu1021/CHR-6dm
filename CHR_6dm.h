@@ -12,11 +12,12 @@ enum RValue{
 
 typedef unsigned char byte;
 
-struct SharedData {
+struct DataOptions {
 	pthread_mutex_t mutex;
 	byte TXData[100];
 	byte RXData[100];
 	bool updated;
+	bool validation;
 }
 
 class CHR-6dm : public SerialPort {
@@ -83,8 +84,8 @@ private:
 	   Unique thread for transmitting and receiving data from serial
 	   port.
 	*/
-	static void *data_handle_thread(void *ptr);
-	struct SharedData;
+	static void *communication(void *ptr);
+	struct DataOptions options;
 	
 
 

@@ -74,7 +74,7 @@ enum RX_Packet{
 };
 namespace CHR {
 
-unsigned short addCheckSum(unsigned char *packet)
+inline unsigned short addCheckSum(unsigned char *packet)
 {
 	int N = packet[4];
 	unsigned short sum = 0;
@@ -85,7 +85,7 @@ unsigned short addCheckSum(unsigned char *packet)
 	return sum;
 }
 
-bool verifyCheckSum(unsigned char *packet)
+inline bool verifyCheckSum(unsigned char *packet)
 {
 	int N = packet[4];
 	printf("N = %d\n", N);
@@ -100,7 +100,7 @@ bool verifyCheckSum(unsigned char *packet)
 	return (sum_inpacket == sum);
 }
 
-bool verifyPacket(unsigned char *packet)
+inline bool verifyPacket(unsigned char *packet)
 {
 	if (packet[0] != 's' || packet[1] != 'n' || packet[2] != 'p')
 		return false;

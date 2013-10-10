@@ -1,0 +1,29 @@
+1. There will be a specific function, say:
+   
+   void *DataTXRX(void *ptr);
+
+   which handles the transmition and reception. This function can be a
+   single shot, which is used to transmit the device options, or 
+   infinitely looped during the measurement mode.
+   
+   A structure will be passed by pointer to this function in order to
+   control its behavior:
+
+   struct Options{
+	   bool oneshot;
+	   bool packet_validation;
+	   unsigned char buffer[BUF_MAX];
+	   pthread_mutex_t mutex;
+   };
+
+   Packet verification will be done in this function and indicated by
+   the packet_validation filed, but it won't resolve the buffer into 
+   true measured value.
+
+   This function sends the data in Options.buffer, and puts the receiving
+   data in the same buffer.
+
+
+
+
+

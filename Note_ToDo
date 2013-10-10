@@ -1,0 +1,18 @@
+1. If the data reading thread is blocking at the read() call, could this thread
+   be canceled by other thread? If so, other thread can be used as timer to
+   count how much time did the thread spend on block reading.
+   If not, the corresponding timeout settings must be done on the serial driver
+   (VTIME, VMIN).
+
+1.Answer:
+   Yes, pthread_cancel can stop a blocking thread. However, in order to prevent
+   some infinite blocking problem, a cleanup function should be registered.
+   For instance, if the thread blocked after aquired the mutex, and the other
+   thread wants to cancel it, then the mutex holding thread will be canceled 
+   without releasing the mutex, thus that mutex will never be unlock again.
+   Two functions can be used to register and unregister a clean up function:
+   
+   void pthread_cleanup_push(void (*routine)(void*),
+		   	     void *arg);
+   void pthread_cleanup_pop(int execute);
+

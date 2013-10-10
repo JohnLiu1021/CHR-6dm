@@ -170,7 +170,7 @@ int SerialPort::WriteData(char *buffer, int num)
 	return wr;
 }
 
-int SerialPort::WriteData(unsigned char *buffer, int num)
+int SerialPort::WriteData(byte *buffer, int num)
 {	
 	int wr = write(_fd, buffer, num);
 	return wr;
@@ -182,7 +182,7 @@ int SerialPort::ReadData(char *buffer, int num)
 	return rd;
 }
 
-int SerialPort::ReadData(unsigned char *buffer, int num)
+int SerialPort::ReadData(byte *buffer, int num)
 {
 	int rd = read(_fd, buffer, num);
 	return rd;
