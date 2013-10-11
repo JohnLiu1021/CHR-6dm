@@ -3,6 +3,9 @@
 
 #include "SerialPort_cpp.h"
 #include "CHR_SensorData.h"
+#include "CHR_PacketType.h"
+
+#include <sys/time.h>
 
 enum RValue{
 	CHR_OK,
@@ -10,21 +13,28 @@ enum RValue{
 	CHR_ErrorCommand
 };
 
+enum UpdateMode{
+	BLOCKING,
+	NONBLOCKING
+};
+
 typedef unsigned char byte;
 
-struct DataOptions {
+struct SharedData {
 	pthread_mutex_t mutex;
 	byte TXData[100];
+	int TXNum;
 	byte RXData[100];
+	int RXNum;
+
 	bool updated;
-	bool validation;
+	bool oneshot;
+	int fd;
 }
 
 class CHR-6dm : public SerialPort {
 public:
-	CHR-6dm();
 	CHR-6dm(const char *);
-	CHR-6dm(string);
 	~CHR-6dm();
 
 	/* 
@@ -33,11 +43,12 @@ public:
 	   device is correctly connected. After receiving the response
 	   data, it will also set the device into SILENT_MODE. Thus
 	   users must invoke the gotoMeasurementMode method in order to 
-	   make the device sending sensor package automatically.
+	   make the device sending sensor packet automatically.
+	   
+	   This method needs a Timeout argument, representing the 
+	   timeout in reading the data.
 	*/
-	RValue open(int);
-	RValue open(const char *, int);
-	RValue open(string, int);
+	RValue open(int Timeout);
 
 	/*
 	   This method will resets all AHRS settings to factory default
@@ -77,15 +88,21 @@ public:
 	   This method will block until the data received by the driver
 	   from the device is updated.
 	*/
-	RValue isUpdated(CHR_SensorData *);
+	RValue isUpdated(UpdateMode);
 
 private:
+	CHR_SensorData *_data_packet;
+	struct timeval _timeout_tv;
+	struct timeval _time_tv;
+	bool _measurement_mode;
 	/*
 	   Unique thread for transmitting and receiving data from serial
 	   port.
 	*/
-	static void *communication(void *ptr);
-	struct DataOptions options;
+	static void *_communicator(void *ptr);
+	static void _cleanup_function(void *ptr);
+	struct SharedData _shared;
+};
 	
 
 
