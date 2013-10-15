@@ -1,15 +1,19 @@
 #ifndef CHR_6DM_H
 #define CHR_6DM_H 1
+#include <limits.h>
+#include <pthread.h>
 
 #include "SerialPort_cpp.h"
 #include "CHR_SensorData.h"
 #include "CHR_PacketType.h"
 
-#include <sys/time.h>
+
+using namespace CHR;
 
 enum RValue{
 	CHR_OK,
 	CHR_Timeout,
+	CHR_Error,
 	CHR_ErrorCommand
 };
 
@@ -18,24 +22,28 @@ enum UpdateMode{
 	NONBLOCKING
 };
 
-typedef unsigned char byte;
+enum Costants {
+	BUF_MAX = 255
+};
 
+/* 
+   Data structure stores the configurations and shared data.
+*/
 struct SharedData {
 	pthread_mutex_t mutex;
-	byte TXData[100];
-	int TXNum;
-	byte RXData[100];
-	int RXNum;
-
+	char *path;
+	byte *data;
+	int baudrate;
+	int timeout;
+	int dataNumber;
 	bool updated;
-	bool oneshot;
-	int fd;
-}
+	bool measurement_mode;
+};
 
-class CHR-6dm : public SerialPort {
+class CHR_6dm {
 public:
-	CHR-6dm(const char *);
-	~CHR-6dm();
+	CHR_6dm(const char *);
+	~CHR_6dm();
 
 	/* 
 	   When invoking the open method for the first time, this driver
@@ -67,22 +75,22 @@ public:
 	RValue gotoConfigMode();
 
 	/*
-	   Set active channels in the device. the class CHR_SensorData
+	   Set active channels in the device. the class CHR::SensorData
 	   is used to preserve the settings, thus it's passed by 
 	   pointer.
 	*/
-	RValue setActiveChannels(CHR_SensorData *);
+	RValue setActiveChannels(SensorData *);
 
 	/*
 	   This is how you can get the data in SLIENT_MODE.
 	*/
-	RValue getData(CHR_SensorData *);
+	RValue getData(SensorData *);
 
 	/*
 	   Set the device into BROADCAST_MODE, which transmits the data
 	   automatically. The second argument is the samping rate.
 	*/
-	RValue gotoMeasurementMode(CHR_SensorData *, int);
+	RValue gotoMeasurementMode(SensorData *, int);
 
 	/*
 	   This method will block until the data received by the driver
@@ -91,36 +99,14 @@ public:
 	RValue isUpdated(UpdateMode);
 
 private:
-	CHR_SensorData *_data_packet;
-	struct timeval _timeout_tv;
-	struct timeval _time_tv;
-	bool _measurement_mode;
-	/*
-	   Unique thread for transmitting and receiving data from serial
-	   port.
-	*/
+	struct SharedData _shared;
+	SerialPort serial;
+	SensorData *_data_packet;
+	pthread_t _comm_thread;
+
+	RValue _sending_command(byte *buffer);
 	static void *_communicator(void *ptr);
 	static void _cleanup_function(void *ptr);
-	struct SharedData _shared;
 };
 	
-
-
-
-
-	
-
-
-
-
-
-
-
-
-
-	
-
-
-
-
 #endif

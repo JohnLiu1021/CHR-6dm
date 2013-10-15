@@ -1,10 +1,11 @@
-#ifndef CHR_SENSORDATA_H
-#define CHR_SENSORDATA_H 1
+#ifndef SENSORDATA_H
+#define SENSORDATA_H 1
 
 #include<string.h>
 
 typedef unsigned short mask_16;
 
+namespace CHR {
 /* Enumerators for enable/disable channels */
 enum Channels{az = 1, ay, ax, gz, gy, gx, mz, my, mx,
 	      roll_rate, pitch_rate, yaw_rate, roll, pitch, yaw};
@@ -13,10 +14,34 @@ enum Channels{az = 1, ay, ax, gz, gy, gx, mz, my, mx,
 enum ChannelGroups{Accelerometer, RateGyro, Magnetometer,
 	           EulerRate, EulerAngle};
 
-/* Packet class */
-class CHR_SensorData {
+class DataField {
 public:
-	CHR_SensorData();
+	DataField();
+	~DataField();
+	short *data;
+	double *cal_data;
+	double yaw();
+	double pitch();
+	double roll();
+	double yaw_rate();
+	double pitch_rate();
+	double roll_rate();
+	double mag_z();
+	double mag_y();
+	double mag_x();
+	double gyro_z();
+	double gyro_y();
+	double gyro_x();
+	double accel_z();
+	double accel_y();
+	double accel_x();
+};
+
+
+/* Packet class */
+class SensorData {
+public:
+	SensorData();
 
 	/* Functions for enable/disable channels */
 	mask_16 enableChannel(Channels);
@@ -31,16 +56,23 @@ public:
 	/* Get the channel mask */
 	mask_16 getChannelMask();
 
-	/* Data Field (Raw data, not calibrated yet) */
-	mask_16 accelerometer[3];
-	mask_16 rategyro[3];
-	mask_16 magnetometer[3];
-	mask_16 eulerrate[3];
-	mask_16 eulerangle[3];
+	/* Get first nibble of the channel mask */
+	unsigned char getFirstChannelMask();
 
+	/* Get second nibble of the channel mask */
+	unsigned char getSecondChannelMask();
+	
+	/* Get number of enabled channel */
+	int getNumberOfChannel();
+
+	/* Transform the data in the packet into corresponding field */
+	bool resolvePacket(unsigned char *packet);
+	
+	CHR::DataField datafield;
 private:
 	/* Channel setting */
-	mask_16 channel_mask;
+	mask_16 _channel_mask;
 };
 
+};
 #endif

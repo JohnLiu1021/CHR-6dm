@@ -1,6 +1,8 @@
 #ifndef CHR_PACKETTYPE_H
 #define CHR_PACKETTYPE_H 1
 
+namespace CHR {
+
 enum TX_Packet{
 	COMMAND_COMPLETE	= 0xB0,
 	COMMAND_FAILED,
@@ -72,7 +74,13 @@ enum RX_Packet{
 	GET_MAG_CAL,
 	GET_MAG_BIAS
 };
-namespace CHR {
+
+inline void addHeader(unsigned char *packet)
+{
+	packet[0] = 's';
+	packet[1] = 'n';
+	packet[2] = 'p';
+}
 
 inline unsigned short addCheckSum(unsigned char *packet)
 {
@@ -88,15 +96,17 @@ inline unsigned short addCheckSum(unsigned char *packet)
 inline bool verifyCheckSum(unsigned char *packet)
 {
 	int N = packet[4];
-	printf("N = %d\n", N);
 	unsigned short sum = 0;
 	for (int i=0; i<(N+5); i++)
 		sum += packet[i];
-
-	printf("verified checksum = %X\n", sum);
-
-	unsigned short sum_inpacket = packet[N+5] << 8 + packet[N+6];
-	printf("checksum in packet = %X\n", sum_inpacket);
+	
+	unsigned short sum_inpacket = (packet[N+5] << 8) + packet[N+6];
+	
+	if (sum_inpacket != sum) {
+		fprintf(stderr, "Error CheckSum!\n");
+		fprintf(stderr, "Calculated Checksum : %X\n", sum);
+		fprintf(stderr, "Checksum in Packet  : %X\n", sum_inpacket);
+	}
 	return (sum_inpacket == sum);
 }
 
@@ -105,6 +115,13 @@ inline bool verifyPacket(unsigned char *packet)
 	if (packet[0] != 's' || packet[1] != 'n' || packet[2] != 'p')
 		return false;
 	return verifyCheckSum(packet);
+}
+
+inline bool verifyPacket(unsigned char *packet, CHR::TX_Packet type)
+{
+	if (verifyPacket(packet))
+		return (packet[3] == type);
+	return false;
 }
 
 };
