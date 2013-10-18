@@ -29,23 +29,23 @@ double CHR::DataField::pitch_rate() {return ((double)data[4] * cal_data[1]);}
 
 double CHR::DataField::roll_rate() {return ((double)data[5] * cal_data[1]);}
 
-double CHR::DataField::mag_z() {return ((double)data[6] * cal_data[2]);}
+double CHR::DataField::mag_x() {return ((double)data[6] * cal_data[2]);}
 
 double CHR::DataField::mag_y() {return ((double)data[7] * cal_data[2]);}
 
-double CHR::DataField::mag_x() {return ((double)data[8] * cal_data[2]);}
+double CHR::DataField::mag_z() {return ((double)data[8] * cal_data[2]);}
 
-double CHR::DataField::gyro_z() {return ((double)data[9] * cal_data[3]);}
+double CHR::DataField::gyro_x() {return ((double)data[9] * cal_data[3]);}
 
 double CHR::DataField::gyro_y() {return ((double)data[10] * cal_data[3]);}
 
-double CHR::DataField::gyro_x() {return ((double)data[11] * cal_data[3]);}
+double CHR::DataField::gyro_z() {return ((double)data[11] * cal_data[3]);}
 
-double CHR::DataField::accel_z() {return ((double)data[12] * cal_data[4]);}
+double CHR::DataField::accel_x() {return ((double)data[12] * cal_data[4]);}
 
 double CHR::DataField::accel_y() {return ((double)data[13] * cal_data[4]);}
 
-double CHR::DataField::accel_x() {return ((double)data[14] * cal_data[4]);}
+double CHR::DataField::accel_z() {return ((double)data[14] * cal_data[4]);}
 
 CHR::SensorData::SensorData()
 {

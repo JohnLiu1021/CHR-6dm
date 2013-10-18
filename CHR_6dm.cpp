@@ -110,6 +110,8 @@ RValue CHR_6dm::getData(SensorData *sensor)
 	pthread_mutex_unlock(&_shared.mutex);
 
 	sensor->resolvePacket(local_buffer);
+	printf("mask = %X%X\n", local_buffer[5], local_buffer[6]);
+
 	return CHR_OK;
 }
 

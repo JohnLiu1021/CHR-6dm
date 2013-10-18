@@ -12,7 +12,8 @@ int main(void)
 	printf("Open complete\n");
 
 	SensorData sensor;
-	sensor.enableChannel(Accelerometer);
+	sensor.enableChannel(az);
+	sensor.enableChannel(ax);
 
 	printf("Now set active channel\n");	
 	if (device.setActiveChannels(&sensor) != CHR_OK)
@@ -37,6 +38,12 @@ int main(void)
 		printf("Acc_x:%3.4f Acc_y:%3.4f Acc_z:%3.4f\n", sensor.datafield.accel_x(),
 						       sensor.datafield.accel_y(),
 						       sensor.datafield.accel_z());
+		printf("Mag_x:%3.4f Mag_y:%3.4f Mag_z:%3.4f\n", sensor.datafield.mag_x(),
+						       sensor.datafield.mag_y(),
+						       sensor.datafield.mag_z());
+		printf("Gyro_x:%3.4f Gyro_y:%3.4f Gyro_z:%3.4f\n", sensor.datafield.gyro_x(),
+						       sensor.datafield.gyro_y(),
+						       sensor.datafield.gyro_z());
 		usleep(100000);
 	}
 
