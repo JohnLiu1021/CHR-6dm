@@ -26,20 +26,6 @@ enum Costants {
 	BUF_MAX = 255
 };
 
-/* 
-   Data structure stores the configurations and shared data.
-*/
-struct SharedData {
-	pthread_mutex_t mutex;
-	char *path;
-	byte *data;
-	int baudrate;
-	int timeout;
-	int dataNumber;
-	bool updated;
-	bool measurement_mode;
-};
-
 class CHR_6dm {
 public:
 	CHR_6dm(const char *);
@@ -99,6 +85,19 @@ public:
 	RValue isUpdated(UpdateMode);
 
 private:
+	/* 
+	   Data structure stores the configurations and shared data.
+	*/
+	struct SharedData {
+		pthread_mutex_t mutex;
+		char *path;
+		byte *data;
+		int baudrate;
+		int timeout;
+		int dataNumber;
+		bool updated;
+		bool measurement_mode;
+	};
 	struct SharedData _shared;
 	SerialPort serial;
 	SensorData *_data_packet;
