@@ -116,11 +116,12 @@ RValue CHR_6dm::getData(SensorData *sensor)
 	return CHR_OK;
 }
 
-RValue CHR_6dm::getData(SensorData *sensor, UpdateMode)
+RValue CHR_6dm::getData(SensorData *sensor, UpdateMode umode)
 {
-	if (UpdateMode == NONBLOCKING) {
-		byte local_buffer[BUF_MAX];
-		RValue ret_val;
+	byte local_buffer[BUF_MAX];
+	RValue ret_val;
+
+	if (umode == NONBLOCKING) {
 		if (!_shared.measurement_mode) {
 			addHeader(_shared.data);
 			_shared.data[3] = GET_DATA;
@@ -140,20 +141,22 @@ RValue CHR_6dm::getData(SensorData *sensor, UpdateMode)
         
 		return CHR_OK;
 
-	} else if (UpdateMode == BLOCKING) {
+	} else if (umode == BLOCKING) {
 		if (!_shared.measurement_mode)
 			return CHR_Error;
 
 		pthread_mutex_lock(&_shared.mutex);
 		pthread_cond_wait(&_shared.condvar, &_shared.mutex);
 		printf("Signal Received!\n");
+		memcpy(local_buffer, _shared.data, _shared.dataNumber);
+		pthread_mutex_unlock(&_shared.mutex);
+		sensor->resolvePacket(local_buffer);
 
-
-
-
-
-
-
+		return CHR_OK;
+	} else {
+		return CHR_Error;
+	}
+}
 
 /*
    Set the device into BROADCAST_MODE, which transmits the data
