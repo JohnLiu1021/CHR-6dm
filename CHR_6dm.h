@@ -68,9 +68,13 @@ public:
 	RValue setActiveChannels(SensorData *);
 
 	/*
-	   This is how you can get the data in SLIENT_MODE.
+	   Asking for data. Both config and measurement mode could use this
+	   method to obtain the data.
 	*/
 	RValue getData(SensorData *);
+
+	/* Same method with optional Block or nonblocking argument */
+	RValue getData(SensorData *, UpdateMode);
 
 	/*
 	   Set the device into BROADCAST_MODE, which transmits the data
@@ -90,6 +94,7 @@ private:
 	*/
 	struct SharedData {
 		pthread_mutex_t mutex;
+		pthread_cond_t condvar;
 		char *path;
 		byte *data;
 		int baudrate;

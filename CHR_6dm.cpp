@@ -4,6 +4,7 @@ CHR_6dm::CHR_6dm(const char *path)
 {
 	/* Initializing SharedData strcuture */
 	_shared.mutex = PTHREAD_MUTEX_INITIALIZER;
+	_shared.condvar = PTHREAD_COND_INITIALIZER;
 	_shared.data = new byte[BUF_MAX];
 	_shared.path = new char[PATH_MAX];
 	strcpy(_shared.path, path);
@@ -115,6 +116,45 @@ RValue CHR_6dm::getData(SensorData *sensor)
 	return CHR_OK;
 }
 
+RValue CHR_6dm::getData(SensorData *sensor, UpdateMode)
+{
+	if (UpdateMode == NONBLOCKING) {
+		byte local_buffer[BUF_MAX];
+		RValue ret_val;
+		if (!_shared.measurement_mode) {
+			addHeader(_shared.data);
+			_shared.data[3] = GET_DATA;
+			_shared.data[4] = 0;
+			addCheckSum(_shared.data);
+			ret_val = _sending_command(_shared.data);
+			if (ret_val != CHR_OK)
+				return ret_val;
+		}
+        
+		pthread_mutex_lock(&_shared.mutex);
+		memcpy(local_buffer, _shared.data, _shared.dataNumber);
+		pthread_mutex_unlock(&_shared.mutex);
+        
+		sensor->resolvePacket(local_buffer);
+		printf("mask = %X%X\n", local_buffer[5], local_buffer[6]);
+        
+		return CHR_OK;
+
+	} else if (UpdateMode == BLOCKING) {
+		if (!_shared.measurement_mode)
+			return CHR_Error;
+
+		pthread_mutex_lock(&_shared.mutex);
+		pthread_cond_wait(&_shared.condvar, &_shared.mutex);
+		printf("Signal Received!\n");
+
+
+
+
+
+
+
+
 /*
    Set the device into BROADCAST_MODE, which transmits the data
    automatically. The second argument is the samping rate.
@@ -180,8 +220,10 @@ void *CHR_6dm::_communicator(void *ptr)
 			printf("\n");
 			*/
 			pthread_mutex_lock(&s->mutex);
-			s->updated = true;
+			//s->updated = true;
 			memcpy(s->data, local_buffer, s->dataNumber);
+			// Sending signal
+			pthread_cond_signal(&s->condvar);
 			pthread_mutex_unlock(&s->mutex);
 		} else {
 			error_cnt++;
