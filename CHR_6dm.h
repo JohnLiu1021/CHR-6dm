@@ -43,6 +43,7 @@ public:
 	   timeout in reading the data.
 	*/
 	RValue open(int Timeout);
+	RValue open();
 
 	/*
 	   This method will resets all AHRS settings to factory default

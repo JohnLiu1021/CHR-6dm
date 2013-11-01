@@ -39,6 +39,25 @@ RValue CHR_6dm::open(int Timeout)
 	return gotoConfigMode();
 }
 
+RValue CHR_6dm::open()
+{
+	_shared.timeout = 20;
+	_shared.measurement_mode = false;
+
+	int ret;
+	int count = 0;
+	while ((ret = serial.OpenPort(_shared.path)) < 0) {
+		perror("Open serial port");
+		fprintf(stderr, "wait for 3 seconds...\n");
+		sleep(3);
+		count++;
+		if (count >= 10)
+			return CHR_Error;
+	}
+
+	serial.SetAttr(_shared.baudrate, 20, 0);
+	return gotoConfigMode();
+}
 /*
    This method will resets all AHRS settings to factory default
    value.

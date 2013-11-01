@@ -5,7 +5,7 @@ using namespace CHR;
 int main(void)
 {
 	CHR_6dm device("/dev/ttyUSB0");
-	if (device.open(20) != CHR_OK) {
+	if (device.open() != CHR_OK) {
 		fprintf(stderr, "Error Open");
 		return -1;
 	}
