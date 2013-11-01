@@ -147,7 +147,7 @@ RValue CHR_6dm::getData(SensorData *sensor, UpdateMode umode)
 
 		pthread_mutex_lock(&_shared.mutex);
 		pthread_cond_wait(&_shared.condvar, &_shared.mutex);
-		printf("Signal Received!\n");
+		//printf("Signal Received!\n");
 		memcpy(local_buffer, _shared.data, _shared.dataNumber);
 		pthread_mutex_unlock(&_shared.mutex);
 		sensor->resolvePacket(local_buffer);
